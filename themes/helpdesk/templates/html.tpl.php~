@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="<?php print $language->language; ?>" dir="<?php print $language->dir; ?>"<?php print $rdf_namespaces;?>>
+<head profile="<?php print $grddl_profile; ?>">
+  <?php print $head; ?>
+  <title><?php print $head_title; ?></title>
+  <?php print $styles; ?>
+
+  <?php if (theme_get_setting('responsive_respond','helpdesk')): global $base_path; global $base_root; ?>
+  <!-- Media Queries support for IE6-8 -->  
+  <!--[if lt IE 9]>
+    <script src="<?php print $base_root . $base_path . path_to_theme() ?>/js/respond.min.js"></script>
+  <![endif]-->
+  <?php endif; ?>
+  
+  <!-- HTML5 element support for IE6-8 -->
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <?php print $scripts; ?>
+  
+ <link type="text/css" rel="stylesheet" media="all" href="<?php print base_path().path_to_theme(); ?>/fontawesome/css/font-awesome.min.css" />
+ <link href='http://fonts.googleapis.com/css?family=Raleway:400,500,700,600,800,900,100,200,300' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,500,700,600,800,900,100,200,300' rel='stylesheet' type='text/css'>
+   
+   <?php 
+    if (! isset($_SESSION['color']) ) {
+	  $_SESSION['color'] = 'blue';
+    }
+    $flag = 0;
+
+    switch(arg(1)) {
+
+      // Dark Red color
+      case 'red':
+        $_SESSION['color'] = 'red';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'blue':
+        $_SESSION['color'] = 'blue';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'green':
+        $_SESSION['color'] = 'green';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'light-blue':
+        $_SESSION['color'] = 'light-blue';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'purple':
+        $_SESSION['color'] = 'purple';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'light-green':
+        $_SESSION['color'] = 'light-green';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'yellow':
+        $_SESSION['color'] = 'yellow';
+        $flag = 1;
+        break;
+				
+      // Teal color
+      case 'orange':
+        $_SESSION['color'] = 'orange';
+        $flag = 1;
+        break;
+		
+      // Teal color
+      case 'magenta':
+        $_SESSION['color'] = 'magenta';
+        $flag = 1;
+        break;	
+		
+		
+      default:
+        break;
+    }
+    
+   
+    	
+    if($flag) header('Location:'.base_path());   
+    
+        if($_SESSION['color'] != 'yellow' 
+		and $_SESSION['color'] != 'red' 
+		and $_SESSION['color'] != 'blue'
+	    and $_SESSION['color'] != 'green'
+	    and $_SESSION['color'] != 'light-blue'
+		and $_SESSION['color'] != 'purple'
+		and $_SESSION['color'] != 'magenta'
+		and $_SESSION['color'] != 'orange'
+		and $_SESSION['color'] != 'light-green') $_SESSION['color'] = 'red';
+		
+		 
+    print '<link href="'.base_path().$directory .'/css/color-' . $_SESSION['color'] . '-style.css" media="all" rel="stylesheet" type="text/css"/>';
+  ?>
+</head>
+<body class="<?php print $classes; ?>" <?php print $attributes;?>>
+  <div id="skip-link">
+    <a href="#main-content" class="element-invisible element-focusable"><?php print t('Skip to main content'); ?></a>
+  </div>
+
+  <?php print $page_top; ?>
+  <?php print $page; ?>
+  <?php print $page_bottom; ?>
+</body>
+</html>

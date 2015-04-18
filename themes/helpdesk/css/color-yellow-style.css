@@ -1,0 +1,159 @@
+﻿/* $Id: color-blue-style.css,v 1.0.0 2013/09/25 08:18:15 symphonythemes Exp $ */
+/*------------------------------------*\
+	RESET
+\*------------------------------------*/
+
+a,
+a:link,
+a:visited {
+  color: #f9cc3d;
+}
+.themecolor-text {
+  color: #f9cc3d;
+}
+pre,
+div.code {
+  border-left: 5px solid #f9cc3d;
+}
+.highlight {
+  background: #f9cc3d;
+}
+blockquote::before {
+  color: #f9cc3d;
+}
+
+a.btn-default,
+.btn-default {
+  border-color: #f9cc3d;
+  background-color: #f9cc3d;
+  color: #fff;
+}
+.btn-border {
+  border-color: #f9cc3d;
+  background: #fff;
+}
+.btn-default:hover {
+  background-color: #f9cc3d;
+  border-color: #f9cc3d;
+}
+a.btn-primary,
+.btn-primary {
+  background-color: #f9cc3d;
+  border-color: #1896b8;
+  color: #FFFFFF;
+}
+#footer h2.block-title:after {
+  background: #f9cc3d;
+}
+.region-sidebar-second h2.block-title {
+  border-top: 2px solid #f9cc3d;
+}
+
+/*------------------------------------*\
+	Pages CSS
+\*------------------------------------*/
+#search-wrapper-inner {
+  background: rgba(249,204,61,0.8);
+}
+
+/*------------------------------------*\
+	NAVIGATION CSS
+\*------------------------------------*/
+li a.active {
+  color: #f9cc3d;
+}
+
+@media (max-width: 767px) {  
+  .navbar-collapse {
+	background:#f9cc3d;
+  }
+}
+
+#main-navigation li a:hover,
+#main-navigation li span.nolink:hover {
+  color:#f9cc3d;
+}
+#main-navigation li.active-trail a,
+#main-navigation li.active-trail  span.nolink,
+#main-navigation li a.active,
+#main-navigation li a.current,
+#main-navigation li a.selected,
+#main-navigation li.active-trail span.nolink,
+#main-navigation li span.nolink.selected {
+  color:#f9cc3d;
+}
+
+#main-navigation li li.active-trail a,
+#main-navigation li li.active-trail  span.nolink,
+#main-navigation li li a.active,
+#main-navigation li li a:hover,
+#main-navigation li li a.current,
+#main-navigation li li a.selected,
+#main-navigation li li span.nolink:hover,
+#main-navigation li li.active-trail span.nolink,
+#main-navigation li li span.nolink.selected {
+  color: #f9cc3d;
+}
+#main-navigation li #main-menu-item-user:before {
+  border-color: #f9cc3d;
+  background: #f9cc3d;
+}
+
+/* Block user menu on top left */
+#header-top-left .block-menu ul.menu li a:hover,
+#header-top-left .block-menu ul.menu li a.active {
+  color: #f9cc3d;
+}
+
+/* User menu */
+#block-system-user-menu ul.menu li a:hover,
+#block-system-user-menu ul.menu li a.active {
+  color: #f9cc3d;
+}
+
+
+/*------------------------------------*\
+	KNOWLEDGE BASE
+\*------------------------------------*/
+.view-list-knowledge .views-row .views-row-inner:hover {
+}
+.view-list-knowledge .views-row .views-field-status span.Publish {
+  background: #f9cc3d;
+}
+.field-name-field-knowledge-tags .field-item a:hover {
+  background: #f9cc3d;
+  border-color: #f9cc3d;
+}
+
+
+.view-subcategories .views-group-item h3 a,
+.view-all-categories .views-group-item h3 a,
+.view-list-tickets .views-row .views-row-inner:hover {
+  border-color: #f9cc3d;
+}
+.view-list-tickets .views-row .views-field-case-status-id,
+.field-name-field-tags .field-item a:hover {
+  background: #f9cc3d;
+  border-color: #f9cc3d;
+}
+
+.block-accordion-menu .ui-accordion .ui-accordion-header a,
+.block-from-our-blog .views-row .views-field-title a:hover,
+.view-ticket-detail .views-field-case-status-id  .field-content,
+.view-ticket-detail .views-field-nid .field-content,
+.view-list-blog .views-field-title a:hover,
+.view-list-tickets .views-row .views-field-title a:hover,
+.view-categories.block-our-categories .views-row .views-row-inner .views-field-name a:hover,
+.view-categories.block-our-categories h3 a:hover,
+.view-categories.browser-all-categories .views-row .views-row-inner .views-field-name a:hover,
+.view-subcategories .views-row .views-row-inner .views-field-title a:hover,
+.view-all-categories .views-row .views-row-inner .views-field-name a:hover,
+.block-accordion-menu .ui-accordion .ui-accordion-content ul li a:hover,
+.block-accordion-menu .ui-accordion .ui-accordion-content ul li a.active,
+.block-relate-knowledge ul li a:hover,
+.view-list-knowledge .views-row .views-field-title a:hover,
+.block-popular-questions-sidebar ul li a:hover,
+.block-recent-topics ul li a:hover {
+  color: #f9cc3d;
+}
+
