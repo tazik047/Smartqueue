@@ -119,6 +119,7 @@
     </ol>
 
 </div>
+<?php print render($content['comments']); ?>
 <!--
 <?php /*die();*/?>
   <?php if ($title_prefix || $title_suffix || $display_submitted || !$page): ?>
@@ -153,6 +154,6 @@
     </footer>
   <?php endif; ?>
 
-  <?php print render($content['comments']); ?>
+  
 -->
 </article>

@@ -19,23 +19,11 @@ function our_module_form_node_form_alter(&$form, &$form_state, $form_id) {
 			print_r($user);
 			die();*/
 			$form['field_group']['und']['#default_value'][]=user_load($user->uid)->field_group['und'][0]['tid'];
-			$form['field_group']['#access'] = 
+			//$form['field_group']['#access'] = 
 			$form['field_brigade']['#access'] = 0;
 		break;
 	}
 }
-
-function our_module_form_node_form_submit($form, &$form_state) {
-  if (!empty($_SESSION['messages']['status'])) {
-    $node = $form_state['node'];
-    $old_message = t('@type %title has been created.', array('@type' => node_type_get_name($node), '%title' => $node->title));
-    $old_message_key = array_search($old_message, $_SESSION['messages']['status']);
-    if ($old_message_key !== FALSE) {
-      $_SESSION['messages']['status'][$old_message_key] = 'Your data has been saved.';
-    }
-  }
-}
-
 function my_validate(&$form, &$form_state){
 
 	/*print '<pre>';
@@ -128,7 +116,7 @@ function get_random_color($str){
 				'rgba(216, 216, 216, 0.25)',
 				'rgba(266, 74, 74, 0.25)',
 				'rgba(211, 33, 33, 0.25)',
-				'rgba(0, 0, 0, 0.25)',
+				'rgba(0, 0, 0, 0, 0.25)',
 				'rgba(248, 231, 28, 0.25)',
 				'rgba(80, 227, 194, 0.25)',
 				'rgba(139, 87, 42, 0.25)');
@@ -148,7 +136,7 @@ function get_random_color($str){
         $hash &= 0xFFFFFFFF;
     }	
 	srand($hash); 
-	return $colors[rand(0,$max_c)];
+	return $colors[rand(0,$max_c-1)];
 }
 
 
