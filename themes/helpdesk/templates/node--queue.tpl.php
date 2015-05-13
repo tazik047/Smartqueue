@@ -12,7 +12,7 @@
             width: 48px;
             height: 48px;
             border: 1px #979797 solid;
-            background: <?php print get_random_color('ОС');?>;
+            background: <?php print get_random_color($node->title);?>;
             position: relative;
             top: -1px;
             left: -1px;
