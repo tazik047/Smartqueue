@@ -149,3 +149,87 @@ function helpdesk_form_simplenews_block_form_alter(&$form) {
   $form['mail']['#attributes']['placeholder'] = t('Enter your Email');
   return $form;
 }
+
+function helpdesk_form_comment_form_alter(&$form, &$form_state) {
+	/*print '<pre>';
+	print_r($form);
+	die();*/
+	if($form['#node']->type=='queue'){
+		array_unshift($form['#validate'], 'my_comment_validate');
+		$form['comment_body']['#after_build'][] = 'my_customize_comment_form';
+	}
+}
+
+function my_customize_comment_form(&$form, &$form_state){
+	global $user;
+	$comments = comment_load_multiple(comment_get_thread($form_state['complete form']['#node'], '', 1000000));
+	if(is_in_queue($comments, $user->uid)){
+		return;
+	}
+	$res = array();
+	print '<style>.views-field-field-group{display:none;}</style>';
+	
+	$form_state['complete form']['#node']->content['links']['comment']['#links']['comment-add']['title'] = 'Добавиться в очередь';
+	$gr = user_load($user->uid)->field_group['und'][0]['tid'];
+	foreach($form_state['complete form']['field_students']['und']['#options'] as $l=>$val){
+		$temp = explode('  ',strip_tags($val));
+		$temp = trim($temp[count($temp)-1]);
+		if($user->uid==$l || $temp!=$gr || is_in_queue($comments, $l)){
+			unset($form_state['complete form']['field_students']['und'][$l]);
+			continue;
+		}
+		$res[$l] = $val;
+	}
+	$form_state['complete form']['subject']['#access'] = 
+	$form_state['complete form']['actions']['preview']['#access'] = 
+	$form_state['complete form']['author']['#access'] = 0;
+	$form_state['complete form']['field_students']['und']['#options'] = $res;
+}
+
+function my_comment_validate(&$form, &$form_state){
+	if(trim($form_state['values']['field_index']['und'][0]['value'])!=''){
+		$ind = (int)$form_state['values']['field_index']['und'][0]['value'];
+		if($ind<1 || $form_state['values']['field_index']['und'][0]['value']!=$ind){
+			form_set_error('№ в очереди', '№ в очереди должен быть целым положительным числом');
+			return;
+		}
+		$max_c = (int)$form['#node']->field_count_group['und'][0]['value'];
+		if($max_c<(1 + count($form['field_students']['und']['#value']))){
+			form_set_error('Бригада', 'В бригаде должно быть не больше '.$max_c. ' человек'.($max_c==1?'a':''));
+			return;
+		}
+		foreach(comment_load_multiple(comment_get_thread($form_state['complete form']['#node'], '', 1000000)) as $l=>$val){
+			/*print '<pre>';
+			print_r($val->field_index['und']['0']['value']);
+			die();*/
+			if($val->field_index['und']['0']['value'] == $ind){
+				form_set_error('Позиция', 'Этот номер уже занят');
+				return;
+			}
+		}/*
+		print '<pre>';
+		print_r($form_state['complete form']);
+		die();*/
+	}
+}
+
+function is_in_queue($comments, $uid){
+	foreach($comments as $l=>$val){
+		$temp = get_arrr_in_queue($val);
+		if(in_array($uid, $temp)){
+			return true;
+		}
+	}
+	return false;
+}
+
+function get_arrr_in_queue($comment){
+	$queue = array();
+	$queue[] = $comment->uid;
+	//print_r($comment->field_students['und'][0]);
+	if(!isset($comment->field_students['und'])) return $queue;
+	foreach($comment->field_students['und'][0] as $l=>$val){
+			$queue[] = $val;
+	}
+	return $queue;
+}

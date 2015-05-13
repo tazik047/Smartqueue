@@ -1,0 +1,155 @@
+<?php
+/**
+ * Implements hook_form_BASE_FORM_ID_alter(): node_form.
+ */
+ 
+function our_module_form_node_form_alter(&$form, &$form_state, $form_id) {
+	switch ($form_id) {
+		case 'bid_node_form':
+		case 'application_form_for_listener_node_form':
+			$form['actions']['submit']['#submit'][] = 'our_module_form_node_form_submit';
+			array_unshift($form['#validate'], 'my_validate');
+			
+			$form['additional_settings']['#access'] = 0;
+			$form['#after_build'][] = 'set_title';
+		break;
+		case 'queue_node_form':
+			global $user;			
+			/*print '<pre>';
+			print_r($user);
+			die();*/
+			$form['field_group']['und']['#default_value'][]=user_load($user->uid)->field_group['und'][0]['tid'];
+			$form['field_group']['#access'] = 
+			$form['field_brigade']['#access'] = 0;
+		break;
+	}
+}
+
+function our_module_form_node_form_submit($form, &$form_state) {
+  if (!empty($_SESSION['messages']['status'])) {
+    $node = $form_state['node'];
+    $old_message = t('@type %title has been created.', array('@type' => node_type_get_name($node), '%title' => $node->title));
+    $old_message_key = array_search($old_message, $_SESSION['messages']['status']);
+    if ($old_message_key !== FALSE) {
+      $_SESSION['messages']['status'][$old_message_key] = 'Your data has been saved.';
+    }
+  }
+}
+
+function my_validate(&$form, &$form_state){
+
+	/*print '<pre>';
+	print_r($form['field_the_form_of_participating']['und']);
+	die();*/
+	if($form['field_the_form_of_participating']['und']['#value']=='L' ||
+	  $form['field_the_form_of_participating']['und']['#value']=='LW' ||
+	  $form['field_the_form_of_participating']['und']['#value']=='_none'){
+		/*print '<pre>';
+		print_r($form);
+		die();
+		$form['title']['#required'] = 0;*/
+		
+	}
+	else{
+		if(count($form['field_tags']['und']['#value'])==0){
+			form_set_error('Section', t('Section field is required.'));
+		}
+		$b = $form['field_the_form_of_participating']['und']['#value']=='WP' 
+		|| $form['field_the_form_of_participating']['und']['#value']=='WPR';
+		if($b) return;
+		if(!$form['field_abstract']['und'][0]['#file']){
+			form_set_error('Abstract', t('Abstract field is required.'));
+		}
+		
+	}
+}
+
+function our_module_node_access($node, $op, $account) {
+  // If $node is a string, the node has not yet been created. We don't care
+  // about that case.
+  if (is_string($node)) {
+    return NODE_ACCESS_IGNORE;
+  }
+  if ($node->type == 'brigade') {
+    return NODE_ACCESS_DENY;
+  }
+
+  return NODE_ACCESS_IGNORE;
+}
+
+function set_required($required){
+	$form['field_tags']['#required'] = $required;
+	$form['title']['#required'] = $required;
+	$form['field_abstract']['#required'] = $required;
+	$form['field_need_accommodation']['#required'] = $required;
+	$form['field_addition_information']['#required'] = $required;
+}
+
+function set_title($form, &$form_state){
+	drupal_set_title(t('Registration for the conference'));
+	drupal_add_js(drupal_get_path('module', 'our_module') . "/reg_form.js");
+	return $form;
+}
+
+function our_module_action_info() {
+ return array(
+ 'set_in_queue_action' => array(
+ 'type' => 'system',
+ 'label' => t('Записаться в очередь'),
+ 'configurable' => TRUE,
+ 'triggers' => array('comment_insert'),
+ ),
+ );
+}
+
+function set_in_queue_action($obj, $context){
+	print('<pre>');
+	print_r($obj);
+	print('</pre>');
+	print('<pre>');
+	print_r($context);
+	die();
+}
+
+function our_module_comment(&$a1, $op) {
+	print_r($a1);
+		die();
+	if($op =='validate'){
+		print_r($a1);
+		die();
+	}
+}
+
+function get_random_color($str){
+	$colors = array('rgba(126, 211, 33, 0.25)',
+				'rgba(74, 144, 226, 0.25)',
+				'rgba(144, 19, 254, 0.25)',
+				'rgba(245, 166, 35, 0.25)',
+				'rgba(216, 216, 216, 0.25)',
+				'rgba(266, 74, 74, 0.25)',
+				'rgba(211, 33, 33, 0.25)',
+				'rgba(0, 0, 0, 0.25)',
+				'rgba(248, 231, 28, 0.25)',
+				'rgba(80, 227, 194, 0.25)',
+				'rgba(139, 87, 42, 0.25)');
+	$max_c = count($colors);
+	//$str  = $fields['title']->raw;
+	$str = (string)$str;
+    $hash = 0;
+    $len = strlen($str);
+    if ($len == 0 )
+        return $hash;
+
+    for ($i = 0; $i < $len; $i++) {
+        $h = $hash << 5;
+        $h -= $hash;
+        $h += ord($str[$i]);
+        $hash = $h;
+        $hash &= 0xFFFFFFFF;
+    }	
+	srand($hash); 
+	return $colors[rand(0,$max_c)];
+}
+
+
+
