@@ -27,11 +27,12 @@
 global $user;
 $temp = strip_tags($fields['field_group']->content);
 if($temp==user_load($user->uid)->field_group['und'][0]['tid']){
-//die();
 ?>
 
-<div class = "circle" style="background-color:<?php print get_random_color($fields['title']->raw);?>;">
-        <div class = "textInCircle"><?php print $fields['title']->content; ?></div>
-        <div class = "dateInCircle"><?php print $fields['field_date']->content; ?></div>
-</div>
+<a href="<?php print strip_tags($fields['path']->content);?>" >
+	<div class = "circle" style="background-color:<?php print get_random_color($fields['title']->raw);?>;">
+			<div class = "textInCircle"><?php print $fields['title']->content; ?></div>
+			<div class = "dateInCircle"><?php print $fields['field_date']->content; ?></div>
+	</div>
+</a>
 <?php } ?>

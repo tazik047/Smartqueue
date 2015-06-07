@@ -14,6 +14,9 @@
             border: 1px #979797 solid;
             -moz-border-radius: 22px; /* закругление для старых Mozilla Firefox */
             -webkit-border-radius: 22px; /* закругление для старых Chrome и Safari */
+            margin-top: 40px;
+            margin-left: 40px;
+            float:left;
         }
 		
 		.circle1 {
@@ -44,6 +47,7 @@
             position: relative;
             top: -56px;
             left: 130px;
+			width: 130px;
         }
 		
         .circle {

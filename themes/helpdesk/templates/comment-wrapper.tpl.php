@@ -13,13 +13,19 @@
 
   <?php if($content['comment_form']['#node']->type == 'queue'){
 	//$com_title = 'Добавиться в очередь';
-	global $user;	
-	$comments = comment_load_multiple(comment_get_thread($content['comment_form']['#node'], '', 1000000));
-	/*print '<pre>';
-	print_r($comments);
-	die();*/
-	if(is_in_queue($comments, $user->uid)){
+	global $user;
+	if($content['comment_form']['#node']->field_active['und'][0]['value']=='0')
 		$in_que = true;
+	else{
+		$tid = user_load($user->uid)->field_group['und'][0]['tid'];
+		if($tid != $content['comment_form']['#node']->field_group['und'][0]['tid'])
+			$in_que = true;
+		else{
+			$comments = comment_load_multiple(comment_get_thread($content['comment_form']['#node'], '', 1000000));
+			if(is_in_queue($comments, $user->uid)){
+				$in_que = true;
+			}
+		}
 	}
 	}?>
   <?php if (!$in_que && $content['comment_form']): ?>

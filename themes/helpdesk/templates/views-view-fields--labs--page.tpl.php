@@ -24,22 +24,25 @@
  * @ingroup views_templates
  */
  
-global $user;/*
-print '1<pre>';
-print_r($fields);
-die();*/
+global $user;
 $temp = strip_tags($fields['field_group']->content);
 if($temp==user_load($user->uid)->field_group['und'][0]['tid']){
+	$act = strip_tags($fields['field_active']->content);
 ?>
-
-<div class="rectangle">
-    <div class="circle1" style="background-color:<?php print get_random_color($fields['title']->raw);?>">
-         <div class = "textInCircle1"><?php print $fields['title']->content;?></div>
-    </div>
-    <div class = "textInRectangle1">В бригаде: <?php print strip_tags($fields['field_count_group']->content); ?>
-	<br>
-	Срок: <?php print strip_tags($fields['field_date']->content); ?>
-	<br>В очереди: <?php print $fields['comment_count']->content;?>
+<?php if($act!='0'):?>
+<a href="<?php print strip_tags($fields['path']->content);?>" >
+<?php endif; ?>
+	<div class="rectangle" <?php if($act=='0') print ' style="background-color:rgba(216,216,216,0.5);" '?>	>
+		<div class="circle1" style="background-color:<?php print get_random_color($fields['title']->raw);?>">
+			 <div class = "textInCircle1"><?php print $fields['title']->content;?></div>
+		</div>
+		<div class = "textInRectangle1">В бригаде: <?php print strip_tags($fields['field_count_group']->content); ?>
+		<br>
+		Срок: <?php print strip_tags($fields['field_date']->content); ?>
+		<br>В очереди: <?php print $fields['comment_count']->content;?>
+		</div>
 	</div>
-</div>
+<?php if($act!='0'):?>
+</a>
+<?php endif; ?>
 <?php } ?>

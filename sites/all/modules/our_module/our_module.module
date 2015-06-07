@@ -19,7 +19,7 @@ function our_module_form_node_form_alter(&$form, &$form_state, $form_id) {
 			print_r($user);
 			die();*/
 			$form['field_group']['und']['#default_value'][]=user_load($user->uid)->field_group['und'][0]['tid'];
-			//$form['field_group']['#access'] = 
+			$form['field_group']['#access'] = 
 			$form['field_brigade']['#access'] = 0;
 		break;
 	}
@@ -55,11 +55,18 @@ function my_validate(&$form, &$form_state){
 function our_module_node_access($node, $op, $account) {
   // If $node is a string, the node has not yet been created. We don't care
   // about that case.
+  
   if (is_string($node)) {
     return NODE_ACCESS_IGNORE;
   }
-  if ($node->type == 'brigade') {
-    return NODE_ACCESS_DENY;
+  
+  if ($node->type == 'queue' && $op=='view') {
+	  global $user;
+    $tid = user_load($user->uid)->field_group['und'][0]['tid'];
+	if($tid != $node->field_group['und'][0]['tid']){
+		return NODE_ACCESS_DENY;
+	}
+	return NODE_ACCESS_ALLOW;
   }
 
   return NODE_ACCESS_IGNORE;
@@ -108,6 +115,99 @@ function our_module_comment(&$a1, $op) {
 	}
 }
 
+function our_module_node_load($nodes, $types) {
+	if(isset($_REQUEST['run'])){
+		switch($_REQUEST['run']){
+			case 'up':
+				global $user;
+				$comments = comment_load_multiple(comment_get_thread(current($nodes), '', 1000000));
+				usort($comments,'my_cmp');
+				$empty_ind = array();
+				$i = 1;
+				foreach($comments as $l=>$val){
+					while($i!=get_index_from_queue($val)){
+						$empty_ind[] = $i;
+						$i++;
+					}
+					$i++;
+					$temp = get_usrs_in_queue($val);
+					if(in_array($user->uid, $temp)){
+						$c = $val;
+						break;
+					}
+				}
+				if(!isset($c)) return;
+				if(count($empty_ind)!=0){
+					$c->field_index['und'][0]['value'] = end($empty_ind);
+					comment_save($c);
+				}
+			break;
+			case 'down':
+				global $user;
+				$comments = comment_load_multiple(comment_get_thread(current($nodes), '', 1000000));
+				usort($comments,'my_cmp');
+				$empty_ind = array();
+				$i = 1;
+				foreach($comments as $l=>$val){
+					while($i!=get_index_from_queue($val)){
+						if(isset($c))
+							$empty_ind[] = $i;
+						$i++;
+					}
+					$i++;
+					if(isset($c)) continue;
+					$temp = get_usrs_in_queue($val);
+					if(in_array($user->uid, $temp)){
+						$c = $val;
+					}
+				}
+				if(!isset($c)) return;
+				$empty_ind[] = $i;
+				$c->field_index['und'][0]['value'] = current($empty_ind);
+				comment_save($c);
+			break;
+			case 'del':
+				global $user;				
+				$comments = comment_load_multiple(comment_get_thread(current($nodes), '', 1000000));
+				foreach($comments as $l=>$val){
+					$temp = get_usrs_in_queue($val);
+					if(in_array($user->uid, $temp)){
+						$c = $val;
+						break;
+					}
+				}
+				if(!isset($c)) return;
+				foreach($c->field_students['und'] as $l=>$val){
+					if($val['uid']==$user->uid){
+						print 'unset';
+						unset($c->field_students['und'][$l]);						
+						comment_save($c);
+						return;
+					}
+				}
+				if(isset($c->field_students['und'][0])){
+					$c->uid = current($c->field_students['und'][0]);
+					unset($c->field_students['und'][0]);
+					comment_save($c);
+				}
+				else{
+					comment_delete($c->cid);
+				}
+			break;
+		}
+	}
+}
+
+function get_usrs_in_queue($comment){
+	$queue = array();
+	$queue[] = $comment->uid;
+	if(!isset($comment->field_students['und'])) return $queue;
+	foreach($comment->field_students['und'] as $l=>$val){
+			$queue[] = $val['uid'];
+	}
+	return $queue;
+}
+
 function get_random_color($str){
 	$colors = array('rgba(126, 211, 33, 0.25)',
 				'rgba(74, 144, 226, 0.25)',
@@ -116,7 +216,7 @@ function get_random_color($str){
 				'rgba(216, 216, 216, 0.25)',
 				'rgba(266, 74, 74, 0.25)',
 				'rgba(211, 33, 33, 0.25)',
-				'rgba(0, 0, 0, 0, 0.25)',
+				'rgba(0, 0, 0, 0.25)',
 				'rgba(248, 231, 28, 0.25)',
 				'rgba(80, 227, 194, 0.25)',
 				'rgba(139, 87, 42, 0.25)');
@@ -139,5 +239,93 @@ function get_random_color($str){
 	return $colors[rand(0,$max_c-1)];
 }
 
+function get_index_from_queue($queue){
+	if(isset($queue->field_index))
+		return $queue->field_index['und'][0]['value'];
+	return $queue['field_index']['#items'][0]['value'];
+}
+	
+function get_students_from_queue($queue){
+	global $user;
+	$this_user = false;
+	if(isset($queue->uid)){
+		$author = user_load($queue->uid);
+	}
+	else{
+		$author = user_load($queue['#comment']->uid);
+	}
+	$this_user = $user->uid == $author->uid;	
+	$res = $author->field_surname['und'][0]['value'];
+	if(isset($author->field_name['und'][0]['value'])){
+		$res = $res.' '.$author->field_name['und'][0]['value'];
+	}
+	if(isset($queue->field_students)){
+		if(count($queue->field_students)!=0){
+			foreach($queue->field_students['und'] as $val){
+				if($val['uid'] == $user->uid) $this_user = true;
+				$u = user_load($val['uid']);
+				
+				$res = $res.', '.$u->field_surname['und'][0]['value'];
+				if(isset($u->field_name['und'][0]['value'])){
+					$res = $res.' '.$u->field_name['und'][0]['value'];
+				}
+			}
+		}
+	}
+	else{
+		if(isset($queue['field_students'])){			
+			foreach($queue['field_students']['#object']->field_students['und'] as $val1){
+				if($val1['user']->uid==$user->uid) $this_user = true;
+				$res = $res.', '.$val1['user']->field_surname['und'][0]['value'];
+				if(isset($val1['user']->user->field_name['und'][0]['value'])){
+					$res = $res.' '.$val1['user']->user->field_name['und'][0]['value'];
+				}
+			}
+		}
+	}
+	if($this_user){
+		$res = $res. '<button class = "control_bt" onclick="jQuery.ajax({data:\'run=up\',success: function(msg){jQuery(\'#block-system-main\').html(jQuery(msg).filter(\'div#page\').find(\'#block-system-main\').html()); }});"><img src="'. base_path() . drupal_get_path('theme', 'helpdesk') . '/images/up_bt.png'.'" /></button>';
+		$res = $res. '<button class = "control_bt" onclick="jQuery.ajax({data:\'run=down\',success: function(msg){jQuery(\'#block-system-main\').html(jQuery(msg).filter(\'div#page\').find(\'#block-system-main\').html()); }});"><img src="'. base_path() . drupal_get_path('theme', 'helpdesk') . '/images/down_bt.png'.'" /></button>';
+		$res = $res. '<button class = "control_bt" onclick="jQuery.ajax({data:\'run=del\',success: function(msg){jQuery(\'#block-system-main\').html(jQuery(msg).filter(\'div#page\').find(\'#block-system-main\').html()); }});"><img src="'. base_path() . drupal_get_path('theme', 'helpdesk') . '/images/delete_bt.png'.'" /></button>';
+	}
+	return $res;
+}
 
+function debug_my_my($obj, $die1){
+	print '<pre>';
+	print_r($obj);
+	print '<pre>';
+	if($die1) die();
+}
+	
+function my_cmp($a, $b) {
+	$a = get_index_from_queue($a);
+	$b = get_index_from_queue($b);
+	if ($a == $b) {
+		return 0;
+	}
+	return ($a < $b) ? -1 : 1;
+}
 
+function our_module_cron(){
+	$query = new EntityFieldQuery();
+	$query->entityCondition('entity_type', 'node');
+	$query->propertyCondition('status', 1);
+	$query->fieldCondition('field_active', 'value', '0', '=');
+	$query->propertyCondition('type', 'queue');
+	$result = $query->execute();
+	$format = 'm.d.y';
+	$nodes = node_load_multiple(array_keys($result['node']));
+	$today = date($format, strtotime("+1 week"));
+	//print 'asdasd |';
+	//print strtotime($today). '| '.$today;
+	foreach($nodes as $node){
+		$d = date($format, strtotime($node->field_date['und'][0]['value']));
+		//print '<br>'.strtotime($d). ' '. $d;
+		if(strtotime($d)<=strtotime($today)){
+			$node->field_active['und'][0]['value'] = 1;
+			//debug_my_my($node, true);
+			node_save($node);			
+		}		
+	}
+}

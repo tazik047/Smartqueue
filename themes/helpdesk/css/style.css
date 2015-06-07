@@ -2830,3 +2830,22 @@ https://developers.facebook.com/docs/reference/plugins/like-box/
   cursor:pointer;
   opacity: 1;
 }
+
+.control_bt{
+	width: 20px;
+	border: none;
+	padding: 0px;
+	background-color: transparent;
+}
+.control_bt:first-child{
+	margin-left:15px;
+}
+.control_bt:last-child{
+	margin-left:5px;
+}
+.control_bt>img{
+	height:20px;
+}
+#views-form-activate-users-page-1 legend {
+  display: none;
+}
